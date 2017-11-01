@@ -1,6 +1,14 @@
+# Adapted from official Solr image!
 
-FROM    openjdk:8-jre-alpine
-MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-base:1.2.3
+MAINTAINER CLARIN ERIC "clarin@clarin.eu"
+
+# Original header
+# FROM    openjdk:8-jre-alpine
+# MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+#
+
+# --------------- BEGIN adapted from official Solr image ---------------------------------
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
@@ -68,5 +76,18 @@ EXPOSE 8983
 WORKDIR /opt/solr
 USER $SOLR_USER
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["solr-foreground"]
+# --------------- END adapted from official Solr image -----------------------------------
+
+# --------------- BEGIN removed from official Solr image ---------------------------------
+# ENTRYPOINT ["docker-entrypoint.sh"]
+# CMD ["solr-foreground"]
+# --------------- END removed from official Solr image -----------------------------------
+
+# --------------- BEGIN added on top of official Solr image ------------------------------
+
+COPY supervisor/dcron.conf /etc/supervisor/conf.d/dcron.conf
+
+COPY fluentd/supervisord.conf /etc/fluentd/conf.d/supervisord.conf
+
+
+# --------------- END added on top of official Solr image --------------------------------
