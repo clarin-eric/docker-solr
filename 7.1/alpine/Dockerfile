@@ -3,6 +3,13 @@
 FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-base:1.2.3
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
+# Install the JRE
+# TODO: replace this with using jre8 base image
+RUN	apk update \
+ && apk upgrade \
+ && apk add --update \
+ 		openjdk8-jre-base 
+
 # Original header
 # FROM    openjdk:8-jre-alpine
 # MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
@@ -74,20 +81,20 @@ RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
 
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
 
 # --------------- END adapted from official Solr image -----------------------------------
 
 # --------------- BEGIN removed from official Solr image ---------------------------------
+# USER $SOLR_USER
 # ENTRYPOINT ["docker-entrypoint.sh"]
 # CMD ["solr-foreground"]
 # --------------- END removed from official Solr image -----------------------------------
 
 # --------------- BEGIN added on top of official Solr image ------------------------------
 
-COPY supervisor/dcron.conf /etc/supervisor/conf.d/dcron.conf
+COPY supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 
-COPY fluentd/supervisord.conf /etc/fluentd/conf.d/supervisord.conf
+COPY fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 
 
 # --------------- END added on top of official Solr image --------------------------------
