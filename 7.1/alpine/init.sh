@@ -6,6 +6,10 @@ DEFAULT_SOLR_HOME="/solr_home"
 function init_app() {
 	echo "Starting Solr initialisation"
 	
+	if [ ! -z "$SOLR_DATA_EXPORT_TARGET" ]; then
+		export_solr_data
+	fi
+		
 	init_solr_home
 	init_solr_data
 	
@@ -65,6 +69,17 @@ function import_solr_data() {
 		cp -r "/docker-entrypoint-initsolr.d/solr_data"/* "$SOLR_DATA_HOME"
 		chown -R $SOLR_USER:$SOLR_GROUP "$SOLR_DATA_HOME"
 		echo "Initialised Solr data in ${SOLR_DATA_HOME}"
+	fi
+}
+
+function export_solr_data() {
+	if [ -d "$SOLR_DATA_EXPORT_TARGET" ]; then
+		echo "Solr data export: copying existing Solr data from ${SOLR_DATA_HOME} to ${SOLR_DATA_EXPORT_TARGET}"
+		cp -r "${SOLR_DATA_HOME}"/* "${SOLR_DATA_EXPORT_TARGET}"
+		echo "Solr data export: done"
+	else
+		echo "Solr data export target locations does not exist or is not a directory: ${SOLR_DATA_EXPORT_TARGET}"
+		exit 1
 	fi
 }
 
