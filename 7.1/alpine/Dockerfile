@@ -85,17 +85,17 @@ WORKDIR /opt/solr
 
 # --------------- BEGIN added on top of official Solr image ------------------------------
 
-COPY supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
+COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 
-COPY fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
+COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 
 ENV SOLR_HOME=/solr-home \
 SOLR_DATA_HOME=/solr-data
 
-COPY init.sh /app/init.sh
+COPY clarin/init.sh /app/init.sh
 RUN chmod u+x /app/init.sh && \
 		touch /app/init.log
-COPY fluentd/init.conf /etc/fluentd/conf.d/init.conf
+COPY clarin/fluentd/init.conf /etc/fluentd/conf.d/init.conf
 
 VOLUME ["/solr-home", "/solr-data"]
 
