@@ -88,14 +88,14 @@ WORKDIR /opt/solr
 COPY supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 
 COPY fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
-COPY fluentd/init.conf /etc/fluentd/conf.d/init.conf
 
 ENV SOLR_HOME=/solr-home \
-	SOLR_DATA_HOME=/solr-data
+SOLR_DATA_HOME=/solr-data
 
 COPY init.sh /app/init.sh
 RUN chmod u+x /app/init.sh && \
 		touch /app/init.log
+COPY fluentd/init.conf /etc/fluentd/conf.d/init.conf
 
 VOLUME ["/solr-home", "/solr-data"]
 
