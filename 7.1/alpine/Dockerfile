@@ -1,14 +1,7 @@
 # Adapted from official Solr image!
 
-FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-base:1.2.6
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.0.3
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
-
-# Install the JRE
-# TODO: replace this with using jre8 base image
-RUN	apk update \
- && apk upgrade \
- && apk add --update \
- 		openjdk8-jre-base 
 
 # Original header
 # FROM    openjdk:8-jre-alpine
