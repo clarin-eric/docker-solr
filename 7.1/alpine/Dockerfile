@@ -1,6 +1,6 @@
 # Adapted from official Solr image!
 
-FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-base:1.2.5
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-base:1.2.6
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Install the JRE
