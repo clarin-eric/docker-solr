@@ -38,8 +38,7 @@ function init_solr_data() {
 		export SOLR_DATA_HOME=$DEFAULT_SOLR_DATA_HOME
 	fi
 	
-	#TODO: Check for content in SOLR_DATA_HOME....
-	if [ -e "$SOLR_DATA_HOME" ]; then
+	if (dir_has_content "$SOLR_DATA_HOME"); then
 		echo "Found existing Solr data home at ${SOLR_DATA_HOME}, not touching it"
 	else
 		echo "Solr home directory $SOLR_HOME does not exist or is empty"
@@ -50,7 +49,7 @@ function init_solr_data() {
 }
 
 function import_solr_home() {
-	if [ -d "/docker-entrypoint-initsolr.d/solr_home" ]; then
+	if (dir_has_content "/docker-entrypoint-initsolr.d/solr_home"); then
 		echo "Found a Solr home to import"
 		purge_solr_home
 		cp -r "/docker-entrypoint-initsolr.d/solr_home"/* "$SOLR_HOME"
@@ -60,7 +59,7 @@ function import_solr_home() {
 }
 
 function import_solr_data() {
-	if [ -d "/docker-entrypoint-initsolr.d/solr_data" ]; then
+	if (dir_has_content "/docker-entrypoint-initsolr.d/solr_data"); then
 		echo "Found Solr data to import"
 		purge_solr_data
 		cp -r "/docker-entrypoint-initsolr.d/solr_data"/* "$SOLR_DATA_HOME"
@@ -80,7 +79,7 @@ function init_solr_home_from_template() {
 }
 
 function purge_solr_home() {
-	if [ -d "$SOLR_HOME" ]; then
+	if (dir_has_content "$SOLR_HOME"); then
 		echo "Removing any original Solr home content at ${SOLR_HOME}"
 		rm -rvf "${SOLR_HOME}"/*
 	else
@@ -89,12 +88,17 @@ function purge_solr_home() {
 }
 
 function purge_solr_data() {
-	if [ -d "$SOLR_DATA_HOME" ]; then
+	if (dir_has_content "$SOLR_DATA_HOME"); then
 		echo "Removing any original Solr data content at ${SOLR_DATA_HOME}"
 		rm -rvf "${SOLR_DATA_HOME}"/*
 	else
 		mkdir -p "$SOLR_DATA_HOME"
 	fi
+}
+
+function dir_has_content() {
+	[ -e "$1" ] && \
+		find "$1" -not -path "$1" | egrep ".*" > /dev/null
 }
 
 init_app
