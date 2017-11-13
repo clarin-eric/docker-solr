@@ -77,6 +77,7 @@ function export_solr_data() {
 		echo "Solr data export: copying existing Solr data from ${SOLR_DATA_HOME} to ${SOLR_DATA_EXPORT_TARGET}"
 		cp -r "${SOLR_DATA_HOME}"/* "${SOLR_DATA_EXPORT_TARGET}"
 		echo "Solr data export: done"
+		exit 0
 	else
 		echo "Solr data export target locations does not exist or is not a directory: ${SOLR_DATA_EXPORT_TARGET}"
 		exit 1
