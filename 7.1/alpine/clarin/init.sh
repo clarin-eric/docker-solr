@@ -91,8 +91,14 @@ function init_solr_home_from_template() {
 
 function purge_solr_home() {
 	if (dir_has_content "$SOLR_HOME"); then
-		echo "Removing any original Solr home content at ${SOLR_HOME}"
-		rm -rvf "${SOLR_HOME}"/*
+		SOLR_HOME_BAK="${SOLR_HOME}.$(date +'%s')"
+		if mkdir -p "${SOLR_HOME_BAK}"; then
+			echo "Moving any original Solr home content from ${SOLR_HOME} to ${SOLR_HOME_BAK}"
+			mv -f "${SOLR_HOME}"/* "${SOLR_HOME_BAK}"
+		else
+			echo "Could not make backup directory. Removing any original Solr home content at ${SOLR_HOME}"
+			rm -rvf "${SOLR_HOME}"/*
+		fi
 	else
 		mkdir -p "$SOLR_HOME"
 	fi
