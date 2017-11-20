@@ -21,19 +21,14 @@ function init_solr_home() {
 		export SOLR_HOME=$DEFAULT_SOLR_DATA_HOME
 	fi
 	
-	if [ -e "$SOLR_HOME/solr.xml" ]; then
-		echo "Found existing Solr home at ${SOLR_HOME}, not touching it"
-	else
-		if [ ! -e "${SOLR_HOME}/solr.xml" ]; then
-			#Solr home does not yet exist, try to import
-			echo "Solr home directory $SOLR_HOME does not exist or is empty"
-			import_solr_home
-		fi
+	[ ! -e "${SOLR_HOME}/solr.xml" ] && \
+		echo "Solr home directory $SOLR_HOME does not exist or is empty"
 	
-		if [ ! -e "${SOLR_HOME}/solr.xml" ]; then
-			echo "No solr home content was imported"
-			init_solr_home_from_template
-		fi
+	import_solr_home
+
+	if [ ! -e "${SOLR_HOME}/solr.xml" ]; then
+		echo "No solr home content was imported"
+		init_solr_home_from_template
 	fi
 }
 
