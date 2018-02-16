@@ -14,10 +14,10 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="7.2.0" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.2.0/solr-7.2.0.tgz" \
-    SOLR_SHA256="1b2cedf176a62c259bfa72db5bf0ba18cc3af255bc8e25187d3b58213535011f" \
-    SOLR_KEYS="E6E21FFCDCEA14C95910EA65051A0FAF76BC6507" \
+    SOLR_VERSION="7.2.1" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.2.1/solr-7.2.1.tgz" \
+    SOLR_SHA256="1dbe8dda842d2008210c0c56d56b714713444fb4e05390bb0bcdec29cf957748" \
+    SOLR_KEYS="052C5B48A480B9CEA9E218A5F98C13CFA5A135D8" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
@@ -52,7 +52,6 @@ RUN mkdir -p /opt/solr && \
   mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr && \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  sed -i -e 's/#SOLR_PORT=8983/SOLR_PORT=8983/' /opt/solr/bin/solr.in.sh && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
 
