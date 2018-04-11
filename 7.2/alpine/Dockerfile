@@ -4,7 +4,7 @@ FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Original header
-# FROM    openjdk:8-jre-alpine
+# FROM openjdk:8-jre-alpine
 # MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 #
 
