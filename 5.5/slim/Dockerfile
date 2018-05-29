@@ -20,10 +20,17 @@ ENV SOLR_USER="solr" \
     SOLR_KEYS="5F55943E13D49059D3F342777186B06E1ED139E7" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
+ENV GOSU_VERSION 1.10
+ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
+
 RUN groupadd -r --gid $SOLR_GID $SOLR_GROUP && \
   useradd -r --uid $SOLR_UID --gid $SOLR_GID $SOLR_USER
 
-RUN set -e; for key in $SOLR_KEYS; do \
+RUN set -e; \
+  export GNUPGHOME="/tmp/gnupg_home" && \
+  mkdir -p "$GNUPGHOME" && \
+  chmod 700 "$GNUPGHOME" && \
+  for key in $SOLR_KEYS $GOSU_KEY; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
@@ -38,7 +45,16 @@ RUN set -e; for key in $SOLR_KEYS; do \
   done; \
   exit 0
 
-RUN mkdir -p /opt/solr && \
+RUN set -e; \
+  export GNUPGHOME="/tmp/gnupg_home" && \
+  dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" && \
+  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch" && \
+  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc" && \
+  gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
+  rm /usr/local/bin/gosu.asc && \
+  chmod +x /usr/local/bin/gosu && \
+  gosu nobody true && \
+  mkdir -p /opt/solr && \
   echo "downloading $SOLR_URL" && \
   wget -nv $SOLR_URL -O /opt/solr.tgz && \
   echo "downloading $SOLR_URL.asc" && \
@@ -49,14 +65,14 @@ RUN mkdir -p /opt/solr && \
   tar -C /opt/solr --extract --file /opt/solr.tgz --strip-components=1 && \
   rm /opt/solr.tgz* && \
   rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr && \
+  mkdir -p /opt/solr/server/solr/lib /opt/solr/server/solr/mycores /opt/solr/server/logs /docker-entrypoint-initdb.d /opt/docker-solr /opt/mysolrhome && \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
+RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr /opt/mysolrhome
 
 EXPOSE 8983
 WORKDIR /opt/solr
