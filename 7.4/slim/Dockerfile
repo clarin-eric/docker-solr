@@ -1,5 +1,5 @@
 
-FROM openjdk:10-jre
+FROM openjdk:10-jre-slim
 MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
 
 # Override the solr download location with e.g.:
@@ -14,10 +14,10 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="7.3.1" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.3.1/solr-7.3.1.tgz" \
-    SOLR_SHA256="0cd8953cf7c85bc0d9a533429200c531822f18807f9fc9fb792c0b149dbd0c4d" \
-    SOLR_KEYS="A72C08F85D7666C3980C35DD1A3859BBABBDB295" \
+    SOLR_VERSION="7.4.0" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.4.0/solr-7.4.0.tgz" \
+    SOLR_SHA256="a50eac8dece0acb5e6f0d868c7868ce8174e299752356f3424a15aa39bd64407" \
+    SOLR_KEYS="E6E21FFCDCEA14C95910EA65051A0FAF76BC6507" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
 ENV GOSU_VERSION 1.10
@@ -69,10 +69,10 @@ RUN set -e; \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr /opt/mysolrhome
+  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
 
 COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr
+RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr /opt/mysolrhome
 
 EXPOSE 8983
 WORKDIR /opt/solr
