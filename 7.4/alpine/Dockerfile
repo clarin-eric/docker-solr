@@ -1,6 +1,6 @@
 # Adapted from official Solr image!
 
-FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.0.3
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.0.6
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Original header
@@ -106,10 +106,7 @@ COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 ENV SOLR_HOME=/solr-home \
 SOLR_DATA_HOME=/solr-data
 
-COPY clarin/init.sh /app/init.sh
-RUN chmod u+x /app/init.sh && \
-		touch /app/init.log
-COPY clarin/fluentd/init.conf /etc/fluentd/conf.d/init.conf
+COPY clarin/init.sh /init/solr-init.sh
 
 VOLUME ["/solr-home", "/solr-data"]
 # --------------- END added on top of official Solr image --------------------------------
