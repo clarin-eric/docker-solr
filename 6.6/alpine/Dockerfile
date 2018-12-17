@@ -19,9 +19,9 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="6.6.4" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.4/solr-6.6.4.tgz" \
-    SOLR_SHA256="cb4a8552c3b60a7a195280e8bcd65ba2c045488fa52778f620138543c5265c50" \
+    SOLR_VERSION="6.6.5" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/6.6.5/solr-6.6.5.tgz" \
+    SOLR_SHA256="fa65e922bc32d36ef65bee866095da563aa5ddd7e953798c06b6494572d51729" \
     SOLR_KEYS="2085660D9C1FCCACC4A479A3BF160FF14992A24C" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
@@ -44,7 +44,7 @@ RUN set -e; \
       pgp.mit.edu \
     ; do \
       echo "  trying $server for $key"; \
-      gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
+      gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
     done; \
     test -z "$found" && echo >&2 "error: failed to fetch $key from several disparate servers -- network issues?" && exit 1; \
   done; \
@@ -52,7 +52,7 @@ RUN set -e; \
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
-  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/')"; \
+  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
   wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
   wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
