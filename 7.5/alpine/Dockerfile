@@ -1,6 +1,6 @@
 # Adapted from official Solr image!
 
-FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.1.0
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.2.0
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Original header
