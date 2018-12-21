@@ -1,3 +1,5 @@
+dist: xenial
+
 sudo: required
 
 language: generic
@@ -5,11 +7,28 @@ language: generic
 services:
 - docker
 
+addons:
+  apt:
+    packages:
+      - docker-ce
+
 before_install:
 - docker info
 
 jobs:
   include:
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.6/slim
+      script: tools/build_test_push.sh 7.6/slim
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.6/alpine
+      script: tools/build_test_push.sh 7.6/alpine
+    - stage: build, test, deploy
+      env:
+      - PROCESS=7.6
+      script: tools/build_test_push.sh 7.6
     - stage: build, test, deploy
       env:
       - PROCESS=7.5/slim
