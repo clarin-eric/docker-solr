@@ -1,6 +1,15 @@
+# Adapted from official Solr image!
 
-FROM openjdk:8-jre-alpine
-MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.2.0
+MAINTAINER CLARIN ERIC "clarin@clarin.eu"
+
+# Original header
+# FROM openjdk:8-jre-alpine
+# MAINTAINER  Martijn Koster "mak-docker@greenhills.co.uk"
+#
+
+# --------------- BEGIN adapted from official Solr image ---------------------------------
+
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
@@ -81,7 +90,24 @@ RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr /opt/mysolrhome
 
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
+# --------------- END adapted from official Solr image -----------------------------------
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["solr-foreground"]
+# --------------- BEGIN removed from official Solr image ---------------------------------
+#USER $SOLR_USER
+#ENTRYPOINT ["docker-entrypoint.sh"]
+#CMD ["solr-foreground"]
+# --------------- END removed from official Solr image -----------------------------------
+
+# --------------- BEGIN added on top of official Solr image ------------------------------
+
+COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
+
+COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
+
+ENV SOLR_HOME=/solr-home \
+SOLR_DATA_HOME=/solr-data
+
+COPY clarin/init.sh /init/solr-init.sh
+
+VOLUME ["/solr-home", "/solr-data"]
+# --------------- END added on top of official Solr image --------------------------------
