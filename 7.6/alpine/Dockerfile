@@ -11,6 +11,7 @@ MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 # --------------- BEGIN adapted from official Solr image ---------------------------------
 
 
+
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
@@ -44,6 +45,7 @@ RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
   mkdir -p "$GNUPGHOME" && \
   chmod 700 "$GNUPGHOME" && \
+  echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf" && \
   for key in $SOLR_KEYS $GOSU_KEY; do \
     found=''; \
     for server in \
@@ -53,6 +55,7 @@ RUN set -e; \
       pgp.mit.edu \
     ; do \
       echo "  trying $server for $key"; \
+      gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
       gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$key" && found=yes && break; \
     done; \
     test -z "$found" && echo >&2 "error: failed to fetch $key from several disparate servers -- network issues?" && exit 1; \
@@ -83,10 +86,9 @@ RUN set -e; \
   sed -i -e 's/"\$(whoami)" == "root"/$(id -u) == 0/' /opt/solr/bin/solr && \
   sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
-  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr
+  chown -R $SOLR_USER:$SOLR_GROUP /opt/solr /opt/mysolrhome /docker-entrypoint-initdb.d /opt/docker-solr
 
-COPY scripts /opt/docker-solr/scripts
-RUN chown -R $SOLR_USER:$SOLR_GROUP /opt/docker-solr /opt/mysolrhome
+COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
 EXPOSE 8983
 WORKDIR /opt/solr

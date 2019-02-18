@@ -23,7 +23,7 @@ relative_dir="$(sed -e "s,$TOP_DIR/,," <<< "$build_dir")"
 cd "$build_dir"
 
 if [[ -z "${IMAGE_NAME:-}" ]]; then
-  IMAGE_NAME="docker-solr/docker-solr"
+  IMAGE_NAME="dockersolr/docker-solr"
 fi
 full_tag="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $2}' "$TOP_DIR/TAGS")"
 
@@ -37,7 +37,7 @@ if ! diff -r "$TOP_DIR/scripts" "scripts"; then
   cp -r "$TOP_DIR/scripts" .
 fi
 
-if [ ! -z "${SOLR_DOWNLOAD_SERVER:-}" ]; then
+if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then
   build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"
 fi
 cmd="docker build --pull --rm=true ${build_arg:-} --tag "$IMAGE_NAME:$full_tag" ."

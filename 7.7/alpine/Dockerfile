@@ -1,6 +1,6 @@
 # Adapted from official Solr image!
 
-FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.2.0
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk8-1.0.3
 MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Original header
@@ -9,7 +9,6 @@ MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 #
 
 # --------------- BEGIN adapted from official Solr image ---------------------------------
-
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
@@ -28,9 +27,9 @@ ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
     SOLR_GROUP="solr" \
     SOLR_GID="8983" \
-    SOLR_VERSION="7.5.0" \
-    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.5.0/solr-7.5.0.tgz" \
-    SOLR_SHA256="eac2daffc376dd8057ee831fbfc4a1b8ee236b8ad94122e11d67fd2b242acebc" \
+    SOLR_VERSION="7.7.0" \
+    SOLR_URL="${SOLR_DOWNLOAD_SERVER:-https://archive.apache.org/dist/lucene/solr}/7.7.0/solr-7.7.0.tgz" \
+    SOLR_SHA256="ad9eaa29449701fcabad497cc5f0506f8a8f76da714dc4a5429a549fcac24dc7" \
     SOLR_KEYS="052C5B48A480B9CEA9E218A5F98C13CFA5A135D8" \
     PATH="/opt/solr/bin:/opt/docker-solr/scripts:$PATH"
 
@@ -91,12 +90,13 @@ COPY --chown=solr:solr scripts /opt/docker-solr/scripts
 
 EXPOSE 8983
 WORKDIR /opt/solr
+
 # --------------- END adapted from official Solr image -----------------------------------
 
 # --------------- BEGIN removed from official Solr image ---------------------------------
-#USER $SOLR_USER
-#ENTRYPOINT ["docker-entrypoint.sh"]
-#CMD ["solr-foreground"]
+# USER $SOLR_USER
+# ENTRYPOINT ["docker-entrypoint.sh"]
+# CMD ["solr-foreground"]
 # --------------- END removed from official Solr image -----------------------------------
 
 # --------------- BEGIN added on top of official Solr image ------------------------------
@@ -108,7 +108,11 @@ COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 ENV SOLR_HOME=/solr-home \
 SOLR_DATA_HOME=/solr-data
 
-COPY clarin/init.sh /init/solr-init.sh
+COPY clarin/init.sh /app/init.sh
+RUN chmod u+x /app/init.sh && \
+		touch /app/init.log
+COPY clarin/fluentd/init.conf /etc/fluentd/conf.d/init.conf
 
 VOLUME ["/solr-home", "/solr-data"]
+
 # --------------- END added on top of official Solr image --------------------------------

@@ -1,3 +1,5 @@
 #!/bin/bash
 set -euo pipefail
-docker build -t docker-solr/builder .
+TOP_DIR="$(cd "$(dirname "$BASH_SOURCE")/.."; echo "$PWD")"
+cd "$TOP_DIR/builder"
+docker build -t dockersolr/builder .
