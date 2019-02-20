@@ -88,19 +88,21 @@ RUN set -e; \
   sed -i -e '/-Dsolr.clustering.enabled=true/ a SOLR_OPTS="$SOLR_OPTS -Dsun.net.inetaddr.ttl=60 -Dsun.net.inetaddr.negative.ttl=60"' /opt/solr/bin/solr.in.sh && \
   chown -R $SOLR_USER:$SOLR_GROUP /opt/solr /opt/mysolrhome /docker-entrypoint-initdb.d /opt/docker-solr
 
-COPY --chown=solr:solr scripts /opt/docker-solr/scripts
-
 EXPOSE 8983
 WORKDIR /opt/solr
 # --------------- END adapted from official Solr image -----------------------------------
 
 # --------------- BEGIN removed from official Solr image ---------------------------------
+#COPY --chown=solr:solr scripts /opt/docker-solr/scripts
+
 #USER $SOLR_USER
 #ENTRYPOINT ["docker-entrypoint.sh"]
 #CMD ["solr-foreground"]
 # --------------- END removed from official Solr image -----------------------------------
 
 # --------------- BEGIN added on top of official Solr image ------------------------------
+COPY scripts /opt/docker-solr/scripts
+RUN chown $SOLR_USER:$SOLR_GROUP /opt/docker-solr/scripts
 
 COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 
