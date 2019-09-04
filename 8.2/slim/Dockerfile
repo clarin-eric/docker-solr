@@ -137,7 +137,8 @@ RUN chown $SOLR_USER:$SOLR_GROUP /opt/docker-solr/scripts
 
 COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 
-COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
+#TODO: get log from stdout
+#COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 
 ENV SOLR_HOME=/solr-home \
 SOLR_DATA_HOME=/solr-data
