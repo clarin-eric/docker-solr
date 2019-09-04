@@ -14,7 +14,8 @@ RUN apk add --no-cache \
         gnupg \
         procps \
         tar \
-        bash
+        bash \
+        tini
 RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
 
@@ -25,8 +26,9 @@ RUN apk add --no-cache ca-certificates wget && \
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-#RUN apt-get update && \
-#  apt-get -y install acl dirmngr gpg lsof procps wget && \
+#RUN set -e; \
+#  apt-get update; \
+#  apt-get -y install acl dirmngr gpg lsof procps wget; \
 #  rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
@@ -51,10 +53,10 @@ RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
     adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 RUN set -e; \
-  export GNUPGHOME="/tmp/gnupg_home" && \
-  mkdir -p "$GNUPGHOME" && \
-  chmod 700 "$GNUPGHOME" && \
-  echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf" && \
+  export GNUPGHOME="/tmp/gnupg_home"; \
+  mkdir -p "$GNUPGHOME"; \
+  chmod 700 "$GNUPGHOME"; \
+  echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf"; \
   for key in $SOLR_KEYS $GOSU_KEY; do \
     found=''; \
     for server in \
@@ -76,41 +78,44 @@ RUN set -e; \
   apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
   wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
   wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
-  gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
-  rm /usr/local/bin/gosu.asc && \
-  chmod +x /usr/local/bin/gosu && \
-  gosu nobody true && \
-  echo "downloading $SOLR_URL" && \
-  wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz" && \
-  echo "downloading $SOLR_URL.asc" && \
-  wget -nv "$SOLR_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc" && \
-  echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c - && \
-  (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc") && \
-  gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz" && \
-  tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz" && \
-  (cd /opt && ln -s "solr-$SOLR_VERSION" solr) && \
-  rm "/opt/solr-$SOLR_VERSION.tgz"* && \
-  rm -Rf /opt/solr/docs/ && \
-  mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr && \
-  chown -R 0:0 "/opt/solr-$SOLR_VERSION" && \
-  find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755 && \
-  find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644 && \
-  chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" "/opt/solr-$SOLR_VERSION/contrib/prometheus-exporter/bin/solr-exporter" && \
-  mkdir -p /etc/default && \
-  cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh && \
-  mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig && \
-  mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig && \
-  chown root:0 /etc/default/solr.in.sh && \
-  chmod 0664 /etc/default/solr.in.sh && \
-  mkdir -p /var/solr/data /var/solr/logs && \
-  (cd /opt/solr/server/solr && cp solr.xml zoo.cfg /var/solr/data/) && \
-  cp /opt/solr/server/resources/log4j2.xml /var/solr/log4j2.xml && \
-  find /var/solr -type d -print0 | xargs -0 chmod 0770 && \
-  find /var/solr -type f -print0 | xargs -0 chmod 0660 && \
-  sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr && \
-  sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr && \
-  chown -R "0:0" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr && \
-  chown -R "$SOLR_USER:0" /var/solr
+  gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+  rm /usr/local/bin/gosu.asc; \
+  chmod +x /usr/local/bin/gosu; \
+  gosu nobody true; \
+  tini --version; \
+  echo "downloading $SOLR_URL"; \
+  wget -nv "$SOLR_URL" -O "/opt/solr-$SOLR_VERSION.tgz"; \
+  echo "downloading $SOLR_URL.asc"; \
+  wget -nv "$SOLR_URL.asc" -O "/opt/solr-$SOLR_VERSION.tgz.asc"; \
+  echo "$SOLR_SHA256 */opt/solr-$SOLR_VERSION.tgz" | sha256sum -c -; \
+  (>&2 ls -l "/opt/solr-$SOLR_VERSION.tgz" "/opt/solr-$SOLR_VERSION.tgz.asc"); \
+  gpg --batch --verify "/opt/solr-$SOLR_VERSION.tgz.asc" "/opt/solr-$SOLR_VERSION.tgz"; \
+  tar -C /opt --extract --file "/opt/solr-$SOLR_VERSION.tgz"; \
+  (cd /opt; ln -s "solr-$SOLR_VERSION" solr); \
+  rm "/opt/solr-$SOLR_VERSION.tgz"*; \
+  rm -Rf /opt/solr/docs/; \
+  mkdir -p /opt/solr/server/solr/lib /docker-entrypoint-initdb.d /opt/docker-solr; \
+  chown -R 0:0 "/opt/solr-$SOLR_VERSION"; \
+  find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755; \
+  find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644; \
+  chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" "/opt/solr-$SOLR_VERSION/contrib/prometheus-exporter/bin/solr-exporter" /opt/solr-$SOLR_VERSION/server/scripts/cloud-scripts; \
+  mkdir -p /etc/default; \
+  cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh; \
+  mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig; \
+  mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig; \
+  chown root:0 /etc/default/solr.in.sh; \
+  chmod 0664 /etc/default/solr.in.sh; \
+  mkdir -p /var/solr/data /var/solr/logs; \
+  (cd /opt/solr/server/solr; cp solr.xml zoo.cfg /var/solr/data/); \
+  cp /opt/solr/server/resources/log4j2.xml /var/solr/log4j2.xml; \
+  find /var/solr -type d -print0 | xargs -0 chmod 0770; \
+  find /var/solr -type f -print0 | xargs -0 chmod 0660; \
+  sed -i -e "s/\"\$(whoami)\" == \"root\"/\$(id -u) == 0/" /opt/solr/bin/solr; \
+  sed -i -e 's/lsof -PniTCP:/lsof -t -PniTCP:/' /opt/solr/bin/solr; \
+  chown -R "0:0" /opt/solr-$SOLR_VERSION /docker-entrypoint-initdb.d /opt/docker-solr; \
+  chown -R "$SOLR_USER:0" /var/solr; \
+  { command -v gpgconf; gpgconf --kill all || :; }; \
+  rm -r "$GNUPGHOME"
 
 COPY --chown=0:0 scripts /opt/docker-solr/scripts
 

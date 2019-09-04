@@ -1,19 +1,21 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`5.5.5-slim`, `5.5-slim`, `5-slim` (*5.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/a6ad91bb7bb4373a0342325f3140966cc1c1ab24/5.5/slim/Dockerfile)
-- [`5.5.5`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/a6ad91bb7bb4373a0342325f3140966cc1c1ab24/5.5/Dockerfile)
-- [`6.6.6-slim`, `6.6-slim`, `6-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/a6ad91bb7bb4373a0342325f3140966cc1c1ab24/6.6/slim/Dockerfile)
-- [`6.6.6`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/a6ad91bb7bb4373a0342325f3140966cc1c1ab24/6.6/Dockerfile)
-- [`7.5.0-slim`, `7.5-slim` (*7.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/7.5/slim/Dockerfile)
-- [`7.5.0`, `7.5` (*7.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/7.5/Dockerfile)
-- [`7.6.0-slim`, `7.6-slim` (*7.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/7.6/slim/Dockerfile)
-- [`7.6.0`, `7.6` (*7.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/7.6/Dockerfile)
-- [`7.7.2-slim`, `7.7-slim`, `7-slim` (*7.7/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/2bf79e0cbd52be50f5049b6415622285346a728e/7.7/slim/Dockerfile)
-- [`7.7.2`, `7.7`, `7` (*7.7/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/2bf79e0cbd52be50f5049b6415622285346a728e/7.7/Dockerfile)
-- [`8.0.0-slim`, `8.0-slim` (*8.0/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/8.0/slim/Dockerfile)
-- [`8.0.0`, `8.0` (*8.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/71ebabff0dce35b97e796ab0c444276c75d6538e/8.0/Dockerfile)
-- [`8.1.1-slim`, `8.1-slim`, `8-slim`, `latest-slim` (*8.1/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/02fff54d99672ee2666bff6f96f008996fb3e3b8/8.1/slim/Dockerfile)
-- [`8.1.1`, `8.1`, `8`, `latest` (*8.1/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/02fff54d99672ee2666bff6f96f008996fb3e3b8/8.1/Dockerfile)
+- [`5.5.5-slim`, `5.5-slim`, `5-slim` (*5.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/5.5/slim/Dockerfile)
+- [`5.5.5`, `5.5`, `5` (*5.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/5.5/Dockerfile)
+- [`6.6.6-slim`, `6.6-slim`, `6-slim` (*6.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/6.6/slim/Dockerfile)
+- [`6.6.6`, `6.6`, `6` (*6.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/6.6/Dockerfile)
+- [`7.5.0-slim`, `7.5-slim` (*7.5/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.5/slim/Dockerfile)
+- [`7.5.0`, `7.5` (*7.5/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.5/Dockerfile)
+- [`7.6.0-slim`, `7.6-slim` (*7.6/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.6/slim/Dockerfile)
+- [`7.6.0`, `7.6` (*7.6/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.6/Dockerfile)
+- [`7.7.2-slim`, `7.7-slim`, `7-slim` (*7.7/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.7/slim/Dockerfile)
+- [`7.7.2`, `7.7`, `7` (*7.7/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/7.7/Dockerfile)
+- [`8.0.0-slim`, `8.0-slim` (*8.0/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.0/slim/Dockerfile)
+- [`8.0.0`, `8.0` (*8.0/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.0/Dockerfile)
+- [`8.1.1-slim`, `8.1-slim` (*8.1/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.1/slim/Dockerfile)
+- [`8.1.1`, `8.1` (*8.1/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.1/Dockerfile)
+- [`8.2.0-slim`, `8.2-slim`, `8-slim`, `latest-slim` (*8.2/slim/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.2/slim/Dockerfile)
+- [`8.2.0`, `8.2`, `8`, `latest` (*8.2/Dockerfile*)](https://github.com/docker-solr/docker-solr/blob/5a84f7eb132a215894264d333bd291360a38e637/8.2/Dockerfile)
 
 For more information about this image and its history, please see [the relevant manifest file (`library/solr`)](https://github.com/docker-library/official-images/blob/master/library/solr). This image is updated via pull requests to [the `docker-solr/docker-solr` GitHub repo](https://github.com/docker-solr/docker-solr).
 
@@ -259,6 +261,17 @@ Changes:
 - The Solr data is now stored in `/var/solr/data` rather than `/opt/solr/server/solr`. The `/opt/solr/server/solr/mycores` no longer exists
 - The custom `SOLR_HOME` can no longer be used, because it is configured in `/etc/default/solr`, and various scripts depend on the new locations
 - The `SOLR_PORT` can no longer be overridden, because it is configured in `/etc/default/solr`
+
+# Running under tini
+
+The docker-solr image runs Solr under [tini](https://github.com/krallin/tini), to make signal handling work better; in particular, this allows you to `kill -9` the JVM. If you run `docker run --init`, or use `init: true` in `docker-compose.yml`, or have added `--init` to `dockerd`, docker will start its `tini` and docker-solr will notice it is not PID 1, and just `exec` Solr. If you do not run with `--init`, then the docker entrypoint script detects that it is running as PID 1, and will start the `tini` present in the docker-solr image, and run Solr under that. If you really do not want to run `tini`, and just run Solr as PID 1 instead, then you can set the `TINI=no` environment variable.
+
+# Out of memory handling
+
+You can use the `OOM` environment variable to control the behaviour of the Solr JVM when an out-of-memory error occurs.
+If you specify `OOM=exit`, docker-solr will add `-XX:+ExitOnOutOfMemoryError` to the JVM arguments, so that the JVM will exit.
+If you specify `OOM=crash`, docker-solr will add `-XX:+CrashOnOutOfMemoryError` to the JVM arguments, so the JVM will crash and produces text and binary crash files (if core files are enabled).
+If you specify `OOM=script`, docker-solr will add `-XX:OnOutOfMemoryError=/opt/docker-solr/scripts/oom_solr.sh`, so the JVM will run that script (and if you want to you can mount your own in its place).
 
 # About this repository
 
