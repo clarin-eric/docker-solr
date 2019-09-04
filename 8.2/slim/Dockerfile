@@ -1,16 +1,33 @@
+# Adapted from official Solr image!
 
-FROM openjdk:11-slim
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk11-1.2.3
+MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
-LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
-LABEL repository="https://github.com/docker-solr/docker-solr"
+# Original header
+#FROM openjdk:11-slim
+#
+#LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
+#LABEL repository="https://github.com/docker-solr/docker-solr"
+
+RUN apk add --no-cache \
+        lsof \
+        gnupg \
+        procps \
+        tar \
+        bash
+RUN apk add --no-cache ca-certificates wget && \
+        update-ca-certificates
+
+# --------------- BEGIN adapted from official Solr image ---------------------------------
+
 
 # Override the solr download location with e.g.:
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN apt-get update && \
-  apt-get -y install acl dirmngr gpg lsof procps wget && \
-  rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#  apt-get -y install acl dirmngr gpg lsof procps wget && \
+#  rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
@@ -30,8 +47,8 @@ ENV SOLR_USER="solr" \
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
-RUN groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP" && \
-  useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
+RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
@@ -56,9 +73,9 @@ RUN set -e; \
 
 RUN set -e; \
   export GNUPGHOME="/tmp/gnupg_home" && \
-  pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" && \
-  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch" && \
-  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch.asc" && \
+  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
+  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
+  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
   rm /usr/local/bin/gosu.asc && \
   chmod +x /usr/local/bin/gosu && \
@@ -79,6 +96,7 @@ RUN set -e; \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755 && \
   find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644 && \
   chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" "/opt/solr-$SOLR_VERSION/contrib/prometheus-exporter/bin/solr-exporter" && \
+  mkdir -p /etc/default && \
   cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh && \
   mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig && \
   mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig && \
@@ -99,7 +117,28 @@ COPY --chown=0:0 scripts /opt/docker-solr/scripts
 VOLUME /var/solr
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
+# --------------- END adapted from official Solr image -----------------------------------
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["solr-foreground"]
+# --------------- BEGIN removed from official Solr image ---------------------------------
+#USER $SOLR_USER
+#
+#ENTRYPOINT ["docker-entrypoint.sh"]
+#CMD ["solr-foreground"]
+# --------------- END removed from official Solr image -----------------------------------
+
+# --------------- BEGIN added on top of official Solr image ------------------------------
+COPY scripts /opt/docker-solr/scripts
+RUN chown $SOLR_USER:$SOLR_GROUP /opt/docker-solr/scripts
+
+COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
+
+COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
+
+ENV SOLR_HOME=/solr-home \
+SOLR_DATA_HOME=/solr-data
+
+COPY clarin/init.sh /init/solr-init.sh
+
+VOLUME ["/solr-home", "/solr-data"]
+# --------------- END added on top of official Solr image --------------------------------
+
