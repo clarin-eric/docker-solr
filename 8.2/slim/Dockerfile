@@ -15,7 +15,8 @@ RUN apk add --no-cache \
         procps \
         tar \
         bash \
-        tini
+        tini \
+        netcat-openbsd
 RUN apk add --no-cache ca-certificates wget && \
         update-ca-certificates
 
@@ -28,7 +29,7 @@ ARG SOLR_DOWNLOAD_SERVER
 
 #RUN set -e; \
 #  apt-get update; \
-#  apt-get -y install acl dirmngr gpg lsof procps wget; \
+#  apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
 #  rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
