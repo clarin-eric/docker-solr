@@ -1,7 +1,6 @@
 # Adapted from official Solr image!
 
 FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk11-1.2.4
-MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 
 # Original header
 #FROM openjdk:11-slim
@@ -10,15 +9,20 @@ MAINTAINER CLARIN ERIC "clarin@clarin.eu"
 #LABEL repository="https://github.com/docker-solr/docker-solr"
 
 RUN apk add --no-cache \
-        lsof \
-        gnupg \
-        procps \
-        tar \
-        bash \
-        tini \
-        netcat-openbsd
-RUN apk add --no-cache ca-certificates wget && \
-        update-ca-certificates
+        lsof=4.91-r0 \
+        gnupg=2.2.19-r0 \
+        procps=3.3.15-r0 \
+        tar=1.32-r0 \
+        bash=5.0.0-r0 \
+        tini=0.18.0-r0 \
+        netcat-openbsd=1.130-r1 \
+        wget=1.20.3-r0
+
+# hadolint ignore=DL3018
+RUN apk add --no-cache ca-certificates \
+  && update-ca-certificates
+
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 
 # --------------- BEGIN adapted from official Solr image ---------------------------------
 
