@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Build a docker-solr build directory and set tags
 #
@@ -41,13 +41,23 @@ else
   cp -r "$TOP_DIR/scripts" .
 fi
 
+build_arg=""
 if [ -n "${SOLR_DOWNLOAD_SERVER:-}" ]; then
   build_arg="--build-arg SOLR_DOWNLOAD_SERVER=$SOLR_DOWNLOAD_SERVER"
+fi
+if [ -n "${SOLR_DOWNLOAD_URL:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_DOWNLOAD_URL=$SOLR_DOWNLOAD_URL"
+fi
+if [ -n "${SOLR_VERSION:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_VERSION=$SOLR_VERSION"
+fi
+if [ -n "${SOLR_SHA512:-}" ]; then
+  build_arg="$build_arg --build-arg SOLR_SHA512=$SOLR_SHA512"
 fi
 if [ "${NOCACHE:-no}" == 'yes' ]; then
   nocache_arg="--no-cache"
 fi
-cmd="docker build --pull --rm=true ${build_arg:-} ${nocache_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
+cmd="docker build --network=host --pull --rm=true ${build_arg:-} ${nocache_arg:-} --tag "$IMAGE_NAME:$full_tag" ."
 echo "running: $cmd"
 $cmd
 extra_tags="$(awk --field-separator ':' '$1 == "'"$relative_dir"'" {print $3}' "$TOP_DIR/TAGS")"

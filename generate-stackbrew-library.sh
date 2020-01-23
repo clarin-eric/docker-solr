@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Produce https://github.com/docker-library/official-images/blob/master/library/solr
 # Based on https://github.com/docker-library/httpd/blob/master/generate-stackbrew-library.sh
@@ -94,7 +94,7 @@ for version in "${versions[@]}"; do
 			"$version"
 		)
 
-		if [[ ! -z "${aliases[$version]:-}" ]]; then
+		if [[ -n "${aliases[$version]:-}" ]]; then
             versionAliases=( "${versionAliases[@]}"  "${aliases[$version]:-}" )
 		fi
 		if [ -z "$variant" ]; then

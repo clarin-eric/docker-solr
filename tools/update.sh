@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # Usage: bash update.sh x.y.z
 #
@@ -8,6 +8,11 @@
 # We verify the content's GPG signature here.
 # We also write a TAGS file with the docker tags for the image.
 set -euo pipefail
+
+if [ "${BASH_VERSINFO:-0}" -lt 4 ]; then
+  echo "This script requires bash 4. You have ${BASH_VERSINFO:-0}"
+  exit 1
+fi
 
 cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.."
 
@@ -76,13 +81,13 @@ function write_files {
         exit 1
     elif [[ "$dash_variant" = "-slim" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-slim
+            FROM=openjdk:11-jre-slim
         else
             FROM=openjdk:8-jre-slim
         fi
     elif [[ -z "$dash_variant" ]]; then
         if (( major_version == 7 && minor_version >= 3 )) || (( major_version > 7 )); then
-            FROM=openjdk:11-stretch
+            FROM=openjdk:11-jre-stretch
         else
             FROM=openjdk:8-jre-stretch
         fi
@@ -96,7 +101,7 @@ function write_files {
     <"$template" sed -E \
       -e "s/FROM \\\$REPLACE_FROM/FROM $FROM/g" \
       -e "s/\\\$REPLACE_SOLR_VERSION/$full_version/g" \
-      -e "s/\\\$REPLACE_SOLR_SHA256/$SHA256/g" \
+      -e "s/\\\$REPLACE_SOLR_SHA512/$SHA512/g" \
       -e "s/\\\$REPLACE_SOLR_KEYS/$KEYS/g" \
       > "$target_dir/Dockerfile"
 
@@ -321,7 +326,7 @@ for version in "${versions[@]}"; do
     verify_signature "$full_version"
 
     # We will record a stronger SHA256, for write_files
-    SHA256=$(sha256sum "solr-$full_version.tgz" | awk '{print $1}')
+    SHA512=$(sha512sum "solr-$full_version.tgz" | awk '{print $1}')
 
     cd "$TOP_DIR"
 
