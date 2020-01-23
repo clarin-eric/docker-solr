@@ -1,8 +1,30 @@
+# Adapted from official Solr image!
 
-FROM openjdk:11-jre-slim
+FROM registry.gitlab.com/clarin-eric/docker-alpine-supervisor-java-base:openjdk11-1.2.4
 
-LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
-LABEL repository="https://github.com/docker-solr/docker-solr"
+# Original header
+#FROM openjdk:11-jre-slim
+#
+#LABEL maintainer="Martijn Koster \"mak-docker@greenhills.co.uk\""
+#LABEL repository="https://github.com/docker-solr/docker-solr"
+
+RUN apk add --no-cache \
+        lsof=4.91-r0 \
+        gnupg=2.2.19-r0 \
+        procps=3.3.15-r0 \
+        tar=1.32-r0 \
+        bash=5.0.0-r0 \
+        tini=0.18.0-r0 \
+        netcat-openbsd=1.130-r1 \
+        wget=1.20.3-r0
+
+# hadolint ignore=DL3018
+RUN apk add --no-cache ca-certificates \
+  && update-ca-certificates
+
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
+# --------------- BEGIN adapted from official Solr image ---------------------------------
 
 ARG SOLR_VERSION="8.4.1"
 ARG SOLR_SHA512="2f210dae8d6a07b111ede22005fbd16aa6848900cda8adb352a33e08229783a170dddb529a7eb990f5157d4f5427c199df2114b9c0ffecdf9490a2ac07c6bb09"
@@ -14,10 +36,10 @@ ARG SOLR_DOWNLOAD_URL
 #   docker build -t mine --build-arg SOLR_DOWNLOAD_SERVER=http://www-eu.apache.org/dist/lucene/solr .
 ARG SOLR_DOWNLOAD_SERVER
 
-RUN set -ex; \
-  apt-get update; \
-  apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
-  rm -rf /var/lib/apt/lists/*
+#RUN set -ex; \
+#  apt-get update; \
+#  apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
+#  rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
     SOLR_UID="8983" \
@@ -36,19 +58,18 @@ ENV SOLR_USER="solr" \
 ENV GOSU_VERSION 1.11
 ENV GOSU_KEY B42F6819007F00F88E364FD4036A9C25BF357DD4
 
-ENV TINI_VERSION v0.18.0
-ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
+#ENV TINI_VERSION v0.18.0
+#ENV TINI_KEY 595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7
 
-RUN set -ex; \
-  groupadd -r --gid "$SOLR_GID" "$SOLR_GROUP"; \
-  useradd -r --uid "$SOLR_UID" --gid "$SOLR_GID" "$SOLR_USER"
+RUN addgroup -S -g $SOLR_GID $SOLR_GROUP && \
+    adduser -S -u $SOLR_UID -G $SOLR_GROUP $SOLR_USER
 
 RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
   mkdir -p "$GNUPGHOME"; \
   chmod 700 "$GNUPGHOME"; \
   echo "disable-ipv6" >> "$GNUPGHOME/dirmngr.conf"; \
-  for key in $SOLR_KEYS $GOSU_KEY $TINI_KEY; do \
+  for key in $SOLR_KEYS $GOSU_KEY; do \
     found=''; \
     for server in \
       ha.pool.sks-keyservers.net \
@@ -66,18 +87,13 @@ RUN set -ex; \
 
 RUN set -ex; \
   export GNUPGHOME="/tmp/gnupg_home"; \
-  pkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch"; \
-  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$pkgArch.asc"; \
+  apkArch="$(apk --print-arch | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')"; \
+  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch"; \
+  wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$apkArch.asc"; \
   gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
   rm /usr/local/bin/gosu.asc; \
   chmod +x /usr/local/bin/gosu; \
   gosu nobody true; \
-  wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch"; \
-  wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini-$pkgArch.asc"; \
-  gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini; \
-  rm /usr/local/bin/tini.asc; \
-  chmod +x /usr/local/bin/tini; \
   tini --version; \
   MAX_REDIRECTS=1; \
   if [ -n "$SOLR_DOWNLOAD_URL" ]; then \
@@ -112,6 +128,7 @@ RUN set -ex; \
   find "/opt/solr-$SOLR_VERSION" -type d -print0 | xargs -0 chmod 0755; \
   find "/opt/solr-$SOLR_VERSION" -type f -print0 | xargs -0 chmod 0644; \
   chmod -R 0755 "/opt/solr-$SOLR_VERSION/bin" "/opt/solr-$SOLR_VERSION/contrib/prometheus-exporter/bin/solr-exporter" /opt/solr-$SOLR_VERSION/server/scripts/cloud-scripts; \
+  mkdir -p /etc/default; \
   cp /opt/solr/bin/solr.in.sh /etc/default/solr.in.sh; \
   mv /opt/solr/bin/solr.in.sh /opt/solr/bin/solr.in.sh.orig; \
   mv /opt/solr/bin/solr.in.cmd /opt/solr/bin/solr.in.cmd.orig; \
@@ -134,7 +151,26 @@ COPY --chown=0:0 scripts /opt/docker-solr/scripts
 VOLUME /var/solr
 EXPOSE 8983
 WORKDIR /opt/solr
-USER $SOLR_USER
+# --------------- END adapted from official Solr image -----------------------------------
 
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["solr-foreground"]
+# --------------- BEGIN removed from official Solr image ---------------------------------
+#USER $SOLR_USER
+#
+#ENTRYPOINT ["docker-entrypoint.sh"]
+#CMD ["solr-foreground"]
+# --------------- END removed from official Solr image -----------------------------------
+
+# --------------- BEGIN added on top of official Solr image ------------------------------
+COPY scripts /opt/docker-solr/scripts
+RUN chown $SOLR_USER:$SOLR_GROUP /opt/docker-solr/scripts
+
+COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
+COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
+
+ENV SOLR_HOME=/solr-home \
+SOLR_DATA_HOME=/solr-data
+
+COPY clarin/init.sh /init/solr-init.sh
+
+VOLUME ["/solr-home", "/solr-data"]
+# --------------- END added on top of official Solr image --------------------------------
