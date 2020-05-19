@@ -38,7 +38,7 @@ ARG SOLR_DOWNLOAD_SERVER
 
 #RUN set -ex; \
 #  apt-get update; \
-#  apt-get -y install acl dirmngr gpg lsof procps wget netcat; \
+#  apt-get -y install acl dirmngr gpg lsof procps wget netcat gosu tini; \
 #  rm -rf /var/lib/apt/lists/*
 
 ENV SOLR_USER="solr" \
