@@ -87,7 +87,7 @@ You will also need to install [bashbrew](https://github.com/docker-library/offic
 sudo apt-get update
 sudo apt-get -y install lsof procps curl wget gpg gawk shellcheck vim less git parallel
 sudo apt-get -y install docker.io
-sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/lastSuccessfulBuild/artifact/bin/bashbrew-amd64
+sudo wget -nv --output-document=/usr/local/bin/bashbrew https://doi-janky.infosiftr.net/job/bashbrew/job/master/lastSuccessfulBuild/artifact/bashbrew-amd64
 sudo chmod a+x /usr/local/bin/bashbrew
 sudo adduser $USER docker
 ```
@@ -136,13 +136,6 @@ git checkout -b myrelease
 Next we run the update script. This will discover any new versions of Solr, and creates a directory for it if needed.
 This script will re-generate all the Dockerfiles, using the `Dockerfile*.template` files in the top-level directory.
 So don't ever make manual changes to the Dockerfiles, as they will be overridden.
-
-If you're in Europe, you can optionally override the download file locations for much faster downloads:
-
-```bash
-export SOLR_DOWNLOAD_SERVER="http://www-eu.apache.org/dist/lucene/solr"
-export archiveUrl="https://www-eu.apache.org/dist/lucene/solr"
-```
 
 ```bash
 tools/update.sh
