@@ -163,18 +163,16 @@ WORKDIR /opt/solr
 
 # --------------- BEGIN added on top of official Solr image ------------------------------
 COPY clarin/init.sh /init/solr-init.sh
-COPY clarin/solr-healthcheck.bash /usr/bin/solr-healthcheck
 COPY clarin/supervisor/solr.conf /etc/supervisor/conf.d/solr.conf
 COPY clarin/fluentd/solr.conf /etc/fluentd/conf.d/solr.conf
 COPY scripts /opt/docker-solr/scripts
+COPY clarin/solr-healthcheck.bash /etc/healthcheck.d/solr-healthcheck.bash
 
 RUN chown $SOLR_USER:$SOLR_GROUP /opt/docker-solr/scripts \
- && chmod u+x '/usr/bin/solr-healthcheck'
+ && chmod u+x '/etc/healthcheck.d/solr-healthcheck.bash'
 
 ENV SOLR_HOME=/solr-home \
 SOLR_DATA_HOME=/solr-data
 
 VOLUME ["/solr-home", "/solr-data"]
-
-HEALTHCHECK --interval=30s --timeout=30s CMD (supervisor-healthcheck && solr-healthcheck) || exit 1
 # --------------- END added on top of official Solr image --------------------------------
