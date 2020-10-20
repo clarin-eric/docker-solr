@@ -1,12 +1,11 @@
 #!/bin/sh
 SOLR_HOME_TEMPLATE="/opt/solr/server/solr"
 DEFAULT_SOLR_DATA_HOME="/solr_data_home"
-DEFAULT_SOLR_HOME="/solr_home"
 
-function init_app() {
+init_app() {
 	echo "Starting Solr initialisation"
 	
-	if [ ! -z "$SOLR_DATA_EXPORT_TARGET" ]; then
+	if [ -n "$SOLR_DATA_EXPORT_TARGET" ]; then
 		export_solr_data
 	fi
 		
@@ -16,7 +15,7 @@ function init_app() {
 	echo "Solr initialisation completed"
 }
 
-function init_solr_home() {
+init_solr_home() {
 	if [ -z "$SOLR_HOME" ]; then
 		export SOLR_HOME=$DEFAULT_SOLR_DATA_HOME
 	fi
@@ -32,7 +31,7 @@ function init_solr_home() {
 	fi
 }
 
-function init_solr_data() {
+init_solr_data() {
 	if [ -z "$SOLR_DATA_HOME" ]; then
 		export SOLR_DATA_HOME=$DEFAULT_SOLR_DATA_HOME
 	fi
@@ -44,30 +43,30 @@ function init_solr_data() {
 		import_solr_data
 	fi
 	
-	chown -R $SOLR_USER:$SOLR_GROUP "$SOLR_DATA_HOME"
+	chown -R "${SOLR_USER}:${SOLR_GROUP}" "$SOLR_DATA_HOME"
 }
 
-function import_solr_home() {
+import_solr_home() {
 	if (dir_has_content "/docker-entrypoint-initsolr.d/solr_home"); then
 		echo "Found a Solr home to import"
 		purge_solr_home
 		cp -r "/docker-entrypoint-initsolr.d/solr_home"/* "$SOLR_HOME"
-		chown -R $SOLR_USER:$SOLR_GROUP "$SOLR_HOME"
+		chown -R "${SOLR_USER}:${SOLR_GROUP}" "$SOLR_HOME"
 		echo "Initialised Solr home in ${SOLR_HOME}"
 	fi
 }
 
-function import_solr_data() {
+import_solr_data() {
 	if (dir_has_content "/docker-entrypoint-initsolr.d/solr_data"); then
 		echo "Found Solr data to import"
 		purge_solr_data
 		cp -r "/docker-entrypoint-initsolr.d/solr_data"/* "$SOLR_DATA_HOME"
-		chown -R $SOLR_USER:$SOLR_GROUP "$SOLR_DATA_HOME"
+		chown -R "${SOLR_USER}:${SOLR_GROUP}" "$SOLR_DATA_HOME"
 		echo "Initialised Solr data in ${SOLR_DATA_HOME}"
 	fi
 }
 
-function export_solr_data() {
+export_solr_data() {
 	if [ -d "$SOLR_DATA_EXPORT_TARGET" ]; then
 		echo "Solr data export: copying existing Solr data from ${SOLR_DATA_HOME} to ${SOLR_DATA_EXPORT_TARGET}"
 		cp -r "${SOLR_DATA_HOME}"/* "${SOLR_DATA_EXPORT_TARGET}"
@@ -79,17 +78,17 @@ function export_solr_data() {
 	fi
 }
 
-function init_solr_home_from_template() {
+init_solr_home_from_template() {
 	if [ "$SOLR_HOME" != "$SOLR_HOME_TEMPLATE" ]; then
 		echo "Initialising Solr home with default Solr home content"
 		purge_solr_home
 		cp -r "${SOLR_HOME_TEMPLATE}"/* "$SOLR_HOME"
-		chown -R $SOLR_USER:$SOLR_GROUP "$SOLR_HOME"
+		chown -R "${SOLR_USER}:${SOLR_GROUP}" "$SOLR_HOME"
 		echo "Initialised Solr home in ${SOLR_HOME}"
 	fi
 }
 
-function purge_solr_home() {
+purge_solr_home() {
 	if (dir_has_content "$SOLR_HOME"); then
 		SOLR_HOME_BAK="${SOLR_HOME}.$(date +'%s')"
 		if mkdir -p "${SOLR_HOME_BAK}"; then
@@ -97,25 +96,25 @@ function purge_solr_home() {
 			mv -f "${SOLR_HOME}"/* "${SOLR_HOME_BAK}"
 		else
 			echo "Could not make backup directory. Removing any original Solr home content at ${SOLR_HOME}"
-			rm -rvf "${SOLR_HOME}"/*
+			rm -rvf "${SOLR_HOME:?}"/*
 		fi
 	else
 		mkdir -p "$SOLR_HOME"
 	fi
 }
 
-function purge_solr_data() {
+purge_solr_data() {
 	if (dir_has_content "$SOLR_DATA_HOME"); then
 		echo "Removing any original Solr data content at ${SOLR_DATA_HOME}"
-		rm -rvf "${SOLR_DATA_HOME}"/*
+		rm -rvf "${SOLR_DATA_HOME:?}"/*
 	else
-		mkdir -p "$SOLR_DATA_HOME"
+		mkdir -p "${SOLR_DATA_HOME}"
 	fi
 }
 
-function dir_has_content() {
+dir_has_content() {
 	[ -e "$1" ] && \
-		find "$1" -not -path "$1" | egrep ".*" > /dev/null
+		find "$1" -not -path "$1" | grep -E ".*" > /dev/null
 }
 
 init_app
