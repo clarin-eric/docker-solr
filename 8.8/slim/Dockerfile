@@ -4,9 +4,9 @@ FROM openjdk:11-jre-slim
 LABEL maintainer="The Apache Lucene/Solr Project"
 LABEL repository="https://github.com/docker-solr/docker-solr"
 
-ARG SOLR_VERSION="8.6.3"
-ARG SOLR_SHA512="f040d4489118b655bd27451a717c1f22f180c398638d944a53889a1a449e7032b016cecbff1979c2e8bfd51fc037dd613f3b968254001d34fe0e8fc4f6761dcf"
-ARG SOLR_KEYS="902CC51935C140BF820230961FD5295281436075"
+ARG SOLR_VERSION="8.8.1"
+ARG SOLR_SHA512="a13ad0f8d67e6465d01bd50b9965a042849395e84024cd1093f9e44b9c602ab43b7bbc2f2bc5c1161178ac6bb0c3f717573c69d51baf0aa8f97fb8b5a97a9ffd"
+ARG SOLR_KEYS="fbc25d7e1712025294fe66590a6aa179b9bbf45e"
 # If specified, this will override SOLR_DOWNLOAD_SERVER and all ASF mirrors. Typically used downstream for custom builds
 ARG SOLR_DOWNLOAD_URL
 
