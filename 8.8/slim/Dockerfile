@@ -15,7 +15,7 @@ RUN apk add --no-cache \
         lsof=4.91-r0 \
         gnupg=2.2.19-r0 \
         procps=3.3.15-r0 \
-        tar=1.32-r0 \
+        tar=1.32-r1 \
         bash=5.0.0-r0 \
         tini=0.18.0-r0 \
         netcat-openbsd=1.130-r1 \
